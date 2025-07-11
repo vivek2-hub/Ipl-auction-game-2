@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IPL Auction Game</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9; }
+    h1, h2 { text-align: center; }
+    .player-card, .team-card { border: 1px solid #ccc; border-radius: 10px; padding: 10px; margin: 10px; background: #fff; }
+    .player-list, .teams { display: flex; flex-wrap: wrap; justify-content: center; }
+    button { padding: 5px 10px; margin-top: 10px; }
+    .sold { background: #ddd; text-decoration: line-through; }
+  </style>
+</head>
+<body>
+  <h1>IPL Auction Game</h1>
+  <h2>Player Pool</h2>
+  <div class="player-list" id="playerList"></div>
+
+  <h2>Teams</h2>
+  <div class="teams" id="teams"></div>
+
+  <script>
+    const teams = [
+      { name: "Mumbai Indians", budget: 50000000, players: [] },
+      { name: "Chennai Super Kings", budget: 50000000, players: [] },
+      { name: "Royal Challengers Bangalore", budget: 50000000, players: [] },
+      { name: "Kolkata Knight Riders", budget: 50000000, players: [] },
+      { name: "Rajasthan Royals", budget: 50000000, players: [] },
+      { name: "Delhi Capitals", budget: 50000000, players: [] },
+    ];
+
+    const players = [
+      { name: "Virat Kohli", base: 2000000, role: "Batsman" },
+      { name: "Rohit Sharma", base: 2000000, role: "Batsman" },
+      { name: "Jasprit Bumrah", base: 1800000, role: "Bowler" },
+      { name: "Ravindra Jadeja", base: 1800000, role: "All-Rounder" },
+      { name: "KL Rahul", base: 1600000, role: "Wicketkeeper" },
+      { name: "Hardik Pandya", base: 1600000, role: "All-Rounder" },
+      { name: "Suryakumar Yadav", base: 1400000, role: "Batsman" },
+      { name: "Shubman Gill", base: 1400000, role: "Batsman" },
+      { name: "Mohammed Shami", base: 1300000, role: "Bowler" },
+      { name: "Yuzvendra Chahal", base: 1200000, role: "Bowler" },
+    ];
+
+    function formatMoney(val) {
+      return `₹${(val / 10000000).toFixed(2)} Cr`;
+    }
+
+    function renderPlayers() {
+      const container = document.getElementById("playerList");
+      container.innerHTML = "";
+      players.forEach((player, index) => {
+        if (player.sold) return;
+        const card = document.createElement("div");
+        card.className = "player-card";
+        card.innerHTML = `
+          <strong>${player.name}</strong><br>
+          Role: ${player.role}<br>
+          Base Price: ${formatMoney(player.base)}<br>
+          ${teams.map((team, tIndex) => `
+            <button onclick="buyPlayer(${index}, ${tIndex})">
+              ${team.name}
+            </button>
+          `).join(" ")}
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function buyPlayer(playerIndex, teamIndex) {
+      const player = players[playerIndex];
+      const team = teams[teamIndex];
+      const bid = player.base;
+      if (team.budget >= bid) {
+        team.budget -= bid;
+        team.players.push(player);
+        player.sold = true;
+        renderPlayers();
+        renderTeams();
+      } else {
+        alert("Insufficient budget!");
+      }
+    }
+
+    function renderTeams() {
+      const container = document.getElementById("teams");
+      container.innerHTML = "";
+      teams.forEach(team => {
+        const card = document.createElement("div");
+        card.className = "team-card";
+        card.innerHTML = `
+          <strong>${team.name}</strong><br>
+          Budget Left: ${formatMoney(team.budget)}<br>
+          <ul>${team.players.map(p => `<li>${p.name} (${p.role})</li>`).join("")}</ul>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    renderPlayers();
+    renderTeams();
+  </script>
+</body>
+</html>
